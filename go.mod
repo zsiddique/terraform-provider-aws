@@ -15,9 +15,9 @@ require (
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/hashicorp/go-version v1.2.0
 	github.com/hashicorp/terraform-plugin-sdk v1.0.0
-	github.com/hashicorp/vault v0.10.4
 	github.com/jen20/awspolicyequivalence v1.0.0
 	github.com/json-iterator/go v1.1.5 // indirect
+	github.com/keybase/go-crypto v0.0.0-20161004153544-93f5b35093ba
 	github.com/kubernetes-sigs/aws-iam-authenticator v0.3.1-0.20181019024009-82544ec86140
 	github.com/mitchellh/copystructure v1.0.0
 	github.com/mitchellh/go-homedir v1.1.0

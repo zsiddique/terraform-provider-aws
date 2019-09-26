@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/hashicorp/vault/helper/pgpkeys"
 )
 
 func TestGenerateIAMPassword(t *testing.T) {
@@ -241,7 +240,7 @@ func testDecryptPasswordAndTest(nProfile, nAccessKey, key string) resource.TestC
 			return errors.New("No secret access key in state")
 		}
 
-		decryptedPassword, err := pgpkeys.DecryptBytes(password, key)
+		decryptedPassword, err := pgpkeysDecryptBytes(password, key)
 		if err != nil {
 			return fmt.Errorf("Error decrypting password: %s", err)
 		}

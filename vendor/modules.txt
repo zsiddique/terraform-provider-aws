@@ -466,10 +466,6 @@ github.com/hashicorp/terraform-plugin-sdk/internal/vault/sdk/helper/jsonutil
 github.com/hashicorp/terraform-plugin-sdk/internal/version
 github.com/hashicorp/terraform-plugin-sdk/plugin
 github.com/hashicorp/terraform-plugin-sdk/terraform
-# github.com/hashicorp/vault v0.10.4
-github.com/hashicorp/vault/helper/compressutil
-github.com/hashicorp/vault/helper/jsonutil
-github.com/hashicorp/vault/helper/pgpkeys
 # github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d
 github.com/hashicorp/yamux
 # github.com/inconshreveable/mousetrap v1.0.0

@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/hashicorp/vault/helper/pgpkeys"
 )
 
 func TestAccAWSAccessKey_basic(t *testing.T) {
@@ -184,7 +183,7 @@ func testDecryptSecretKeyAndTest(nAccessKey, key string) resource.TestCheckFunc 
 
 		// We can't verify that the decrypted password is correct, because we don't
 		// have it. We can verify that decrypting it does not error
-		_, err := pgpkeys.DecryptBytes(password, key)
+		_, err := pgpkeysDecryptBytes(password, key)
 		if err != nil {
 			return fmt.Errorf("Error decrypting password: %s", err)
 		}
