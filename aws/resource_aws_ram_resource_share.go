@@ -7,9 +7,9 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ram"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/terraform-providers/terraform-provider-aws/aws/internal/keyvaluetags"
 )
 
 func resourceAwsRamResourceShare() *schema.Resource {
@@ -59,8 +59,7 @@ func resourceAwsRamResourceShareCreate(d *schema.ResourceData, meta interface{})
 	}
 
 	if v, ok := d.GetOk("tags"); ok {
-		tags := tagsFromMapRAM(v.(map[string]interface{}))
-		request.Tags = tags
+		request.Tags = keyvaluetags.New(v.(map[string]interface{})).IgnoreAws().RamTags()
 	}
 
 	log.Println("[DEBUG] Create RAM resource share request:", request)
@@ -122,7 +121,7 @@ func resourceAwsRamResourceShareRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("name", resourceShare.Name)
 	d.Set("allow_external_principals", resourceShare.AllowExternalPrincipals)
 
-	if err := d.Set("tags", tagsToMapRAM(resourceShare.Tags)); err != nil {
+	if err := d.Set("tags", keyvaluetags.RamKeyValueTags(resourceShare.Tags).IgnoreAws().Map()); err != nil {
 		return fmt.Errorf("Error setting tags: %s", err)
 	}
 
@@ -157,31 +156,10 @@ func resourceAwsRamResourceShareUpdate(d *schema.ResourceData, meta interface{})
 	}
 
 	if d.HasChange("tags") {
-		// Reset all tags to empty set
-		oraw, nraw := d.GetChange("tags")
-		o := oraw.(map[string]interface{})
-		n := nraw.(map[string]interface{})
-		c, r := diffTagsRAM(tagsFromMapRAM(o), tagsFromMapRAM(n))
-
-		if len(r) > 0 {
-			_, err := conn.UntagResource(&ram.UntagResourceInput{
-				ResourceShareArn: aws.String(d.Id()),
-				TagKeys:          tagKeysRam(r),
-			})
-			if err != nil {
-				return fmt.Errorf("Error deleting RAM resource share tags: %s", err)
-			}
-		}
-
-		if len(c) > 0 {
-			input := &ram.TagResourceInput{
-				ResourceShareArn: aws.String(d.Id()),
-				Tags:             c,
-			}
-			_, err := conn.TagResource(input)
-			if err != nil {
-				return fmt.Errorf("Error updating RAM resource share tags: %s", err)
-			}
+		o, n := d.GetChange("tags")
+	
+		if err := keyvaluetags.RamUpdateTags(conn, d.Id(), o, n); err != nil {
+			return fmt.Errorf("error updating RAM Resource Share (%s) tags: %s", d.Id(), err)
 		}
 
 		d.SetPartial("tags")

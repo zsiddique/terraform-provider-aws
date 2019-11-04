@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ram"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/terraform-providers/terraform-provider-aws/aws/internal/keyvaluetags"
 )
 
 func dataSourceAwsRamResourceShare() *schema.Resource {
@@ -108,7 +109,7 @@ func dataSourceAwsRamResourceShareRead(d *schema.ResourceData, meta interface{})
 				d.Set("owning_account_id", aws.StringValue(r.OwningAccountId))
 				d.Set("status", aws.StringValue(r.Status))
 
-				if err := d.Set("tags", tagsToMapRAM(r.Tags)); err != nil {
+				if err := d.Set("tags", keyvaluetags.RamKeyValueTags(r.Tags).IgnoreAws().Map()); err != nil {
 					return fmt.Errorf("error setting tags: %s", err)
 				}
 
