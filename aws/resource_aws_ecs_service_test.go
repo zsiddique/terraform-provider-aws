@@ -1016,6 +1016,26 @@ func TestAccAWSEcsService_PropagateTags(t *testing.T) {
 	})
 }
 
+func TestAccAWSEcsService_withCapacityProviderStrategy(t *testing.T) {
+	var service ecs.Service
+	rName := acctest.RandomWithPrefix("tf-acc-test")
+	resourceName := "aws_ecs_service.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSEcsServiceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSEcsServiceConfigCapacityProvider(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSEcsServiceExists(resourceName, &service),
+				)
+			},
+		}
+	})
+}
+
 func testAccCheckAWSEcsServiceDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*AWSClient).ecsconn
 
@@ -3048,3 +3068,42 @@ resource "aws_ecs_service" "ghost" {
 }
 `, clusterName, tdName, svcName)
 }
+
+func TestAccAWSEcsService_withCapacityProviderStrategy(clusterName, tdName, svcName string) string {
+	return fmt.Sprintf(`
+resource "aws_ecs_cluster" "test" {
+  name = "%s"
+}
+
+resource "aws_ecs_task_definition" "test-mongodb" {
+  family = "%s"
+
+  container_definitions = <<DEFINITION
+[
+  {
+    "cpu": 128,
+    "essential": true,
+    "image": "mongo:latest",
+    "memory": 128,
+    "name": "mongodb"
+  }
+]
+DEFINITION
+}
+
+resource "aws_ecs_service" "test-mongodb" {
+  name            = "%s"
+  cluster         = "${aws_ecs_cluster.test.id}"
+  task_definition = "${aws_ecs_task_definition.test-mongodb.arn}"
+  desired_count   = 1
+
+  default_capacity_provider_strategy = [
+    {
+        capacity_provider = AWSCLItutorial-capacityprovider",
+        weight = 1,
+        base = 0
+	}]
+}
+`, clusterName, tdName, svcName)
+}
+

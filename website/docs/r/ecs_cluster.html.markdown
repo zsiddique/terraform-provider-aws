@@ -42,7 +42,7 @@ The `setting` configuration block supports the following:
 * `autoscaling_group_provider` - below
 * `capacity_provider_arn`
 * `name`
-* `status`
+* `status` - exported?
 * `tags`
 
 ## autoscaling_group_provider
@@ -57,6 +57,14 @@ The `setting` configuration block supports the following:
 * minimum_scaling_step_size
 * status - "ENABLED"
 * target_capacity
+
+## `default_capacity_provider_strategy`
+
+`default_capacity_provider_strategy` supports the following:
+
+* `base` - (Optional)
+* `capacity_provider` - (Required)
+* `weight` - (Optional)
  
 ## Attributes Reference
 

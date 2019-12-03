@@ -198,6 +198,26 @@ func TestAccAWSEcsCluster_containerInsights(t *testing.T) {
 	})
 }
 
+func TestAccAWSEcsCluster_withCapacityProviders(t *testing.T) {
+	var cluster1 ecs.Cluster
+	rName := acctest.RandomWithPrefix("tf-acc-test")
+	resourceName := "aws_ecs_cluster.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSEcsClusterDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSEcsClusterConfig(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSEcsClusterExists(resourceName, &cluster1),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckAWSEcsClusterDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*AWSClient).ecsconn
 
@@ -325,5 +345,26 @@ resource "aws_ecs_cluster" "test" {
 	value = "disabled"
   }
 }
+`, rName)
+}
+
+func testAccAWSEcsClusterConfigCapacityProviders(rName string) string {
+	return fmt.Sprintf(`
+		resource "aws_ecs_cluster" "test" {
+		name = %q
+		capacity_providers = [{
+			"name": "AAWSCLItutorial-capacityprovider",
+			"autoscaling_group_provider": {
+				"autoscaling_group_arn": "arn:aws:autoscaling:us-west-2:111122223333:autoScalingGroup:24c44d96-606a-427f-826a-f64ba4cc918c:autoScalingGroupName/AWSCLItutorial-asg",
+        		"managed_scaling": {
+		            "status": "ENABLED",
+		            "target_capacity": 100,
+		            "minimum_scaling_group_size": 1,
+		            "maximum_scaling_group_size": 100
+				},
+	        	"managedTerminationProtection": "ENABLED"
+    		}
+		}]
+	}
 `, rName)
 }
