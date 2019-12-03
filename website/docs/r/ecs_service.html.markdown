@@ -72,6 +72,20 @@ resource "aws_ecs_service" "bar" {
 }
 ```
 
+### Capacity Provider Strategy
+
+```hcl
+resource "aws_ecs_service" "example" {
+  name                        = "example"
+  cluster                     = "${aws_ecs_cluster.test.id}"
+  capacity_provider_strategy  = [{
+                                  "weight" = 1
+                                  "base" = 0
+                                  "capacity_provider" = "example-capacity-provider"
+                                  }]
+}
+
+
 ## Argument Reference
 
 The following arguments are supported:
@@ -96,6 +110,7 @@ The following arguments are supported:
 `placement_constraints` is `10`. Defined below.
 * `network_configuration` - (Optional) The network configuration for the service. This parameter is required for task definitions that use the `awsvpc` network mode to receive their own Elastic Network Interface, and it is not supported for other network modes.
 * `service_registries` - (Optional) The service discovery registries for the service. The maximum number of `service_registries` blocks is `1`.
+* `capacity_provider_strategy` - (Optional) The capacity provider strategy to use for the service. More than one can be specified, with a base and weight to assign. Documented below.
 * `tags` - (Optional) Key-value mapping of resource tags
 
 ## deployment_controller
@@ -156,6 +171,14 @@ For more information, see [Task Networking](https://docs.aws.amazon.com/AmazonEC
 * `port` - (Optional) The port value used if your Service Discovery service specified an SRV record.
 * `container_port` - (Optional) The port value, already specified in the task definition, to be used for your service discovery service.
 * `container_name` - (Optional) The container name value, already specified in the task definition, to be used for your service discovery service.
+
+## `capacity_provider_strategy`
+
+`capacity_provider_strategy` supports the following:
+
+* `base` - (Optional)
+* `capacity_provider` - (Required)
+* `weight`
 
 ## Attributes Reference
 
