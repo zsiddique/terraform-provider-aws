@@ -1018,7 +1018,12 @@ func TestAccAWSEcsService_PropagateTags(t *testing.T) {
 
 func TestAccAWSEcsService_withCapacityProviderStrategy(t *testing.T) {
 	var service ecs.Service
-	rName := acctest.RandomWithPrefix("tf-acc-test")
+	rString := acctest.RandString(8)
+
+	clusterName := fmt.Sprintf("tf-acc-cluster-svc-w-ups-%s", rString)
+	tdName := fmt.Sprintf("tf-acc-td-svc-w-ups-%s", rString)
+	svcName := fmt.Sprintf("tf-acc-svc-w-ups-%s", rString)
+
 	resourceName := "aws_ecs_service.test"
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -1027,12 +1032,12 @@ func TestAccAWSEcsService_withCapacityProviderStrategy(t *testing.T) {
 		CheckDestroy: testAccCheckAWSEcsServiceDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAWSEcsServiceConfigCapacityProvider(rName),
+				Config: testAccAWSEcsServiceConfigCapacityProvider(clusterName, tdName, svcName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSEcsServiceExists(resourceName, &service),
-				)
+				),
 			},
-		}
+		},
 	})
 }
 
@@ -3069,7 +3074,7 @@ resource "aws_ecs_service" "ghost" {
 `, clusterName, tdName, svcName)
 }
 
-func TestAccAWSEcsService_withCapacityProviderStrategy(clusterName, tdName, svcName string) string {
+func testAccAWSEcsServiceConfigCapacityProvider(clusterName, tdName, svcName string) string {
 	return fmt.Sprintf(`
 resource "aws_ecs_cluster" "test" {
   name = "%s"
@@ -3099,11 +3104,10 @@ resource "aws_ecs_service" "test-mongodb" {
 
   default_capacity_provider_strategy = [
     {
-        capacity_provider = AWSCLItutorial-capacityprovider",
+        capacity_provider = "AWSCLItutorial-capacityprovider",
         weight = 1,
         base = 0
 	}]
 }
 `, clusterName, tdName, svcName)
 }
-
