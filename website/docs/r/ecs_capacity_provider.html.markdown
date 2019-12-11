@@ -52,6 +52,7 @@ The `managed_scaling` configuration block supports the following:
 In addition to all arguments above, the following attributes are exported:
 
 * `id` - The Amazon Resource Name (ARN) that identifies the capacity provider.
+* `arn` - The Amazon Resource Name (ARN) that identifies the capacity provider.
 
 ## Import
 
